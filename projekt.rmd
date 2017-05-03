@@ -71,3 +71,35 @@ otežati zadatak, ako riječ ima više slova ili ako ima više različitih znač
 complexity = english[, c("RTlexdec", "RTnaming", "LengthInLetters", "NumberComplexSynsets")]
 ```
 
+```{r}
+
+cor(english$Familiarity, english$WrittenFrequency)
+plot(english$Familiarity, english$WrittenFrequency)
+#korelacija i graf prepoznatljivosti riječi i njenog pojavljivanja u tekstovima iz čega se može iščitat da su poznatije riječi koje se više pojavljuju, ali se možda očekivalo da korelacija bude još i veća
+
+#plot(english$Familiarity, english$WrittenSpokenFrequencyRatio)
+
+firstVowel = english[english$CV == "V",]
+firstConsonant = english[english$CV == "C",]
+
+mean(firstConsonant$Familiarity)
+mean(firstVowel$Familiarity)
+
+hist(firstConsonant$Familiarity)
+hist(firstVowel$Familiarity)
+
+var(firstConsonant$Familiarity)
+var(firstVowel$Familiarity)
+
+var.test(firstConsonant$Familiarity, firstVowel$Familiarity)
+
+t.test(firstVowel$Familiarity, firstConsonant$Familiarity, alt = "greater", var.equal = TRUE)
+#Znači testira san je li se ljudima poznatije riječi koje počinju sa samoglasnicima od onih koje počinju sa suglasnicima,histogrami su da bi se pokazala normalnost podataka šta više manje je. Šta se tiče testa nisan baš siguran kako se to interpterira al mislin da kaže da ne postoji razlika.
+
+#cor(english$WrittenSpokenFrequencyRatio, english$RTlexdec)
+help(cor)
+
+
+moreSpoken = english[english$WrittenSpokenFrequencyRatio > 0]
+#je li riječi koje se više govore, dakle writespokefrequncyratio < 0 imaju i veći rezultat na RTnamingu
+```
