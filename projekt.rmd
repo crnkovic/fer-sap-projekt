@@ -1,0 +1,73 @@
+---
+title: "Analiza studije razumijevanja riječi"
+author: "Grupa **sudo**"
+date: "3 May 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Opis eksperimenta
+
+Nad velikim brojem ispitanika proveden je eksperiment razumijevanja engleskog jezika. Ispitanicima su dana dva zadatka te su oba ponavljana više puta. Prvi zadatak (dalje: **A**) bavi se prepoznavanje ispravne riječi, prilikom čega je ispitanik za zadani niz znakova morao odrediti radi li se o ispravnoj riječi engleskog jezike, a drugi zadatak (dalje: **B**) se bavi pravilnim izgovaranjem zadane riječi. Za svaku riječ i svakog ispitanika mjereno je vrijeme rješavanja svakog zadatka, te niz podataka o ispitaniku.
+
+## Ishodi eksperimenta
+
+Cilj eksperimenta je naučiti kako mjerene veličine ispitanika utječu na vrijeme potrebno za rješavanje pojedinih zadataka. Na temelju tih podataka može se odgovoriti na neka zanimljiva pitanja poput: utječe li dob na brzinu rješavanja zadataka, kako na brzinu rješavanja utječe duljina zadane riječi, je li riječ kraća ukoliko se češće pojavljuje, itd.
+
+# Skup podataka
+
+Za određivanje ishoda eksperimenta potreban nam je skup podataka eksperimenta. Programski jezik R sadrži skup podataka već provedenog eksperimenta te nam dopušta uključivanje tog skupa te analizu podataka. Podaci se nalaze u paketu `languageR`. Nakon instaliranja paketa, podaci se mogu učitati naredbom `require(languageR)` te dohvatiti s naredbom `data(english)`. Kompletno dohvaćanje i uključivanje podataka prikazano je kodom ispod.
+
+```{r}
+require(languageR, quietly = TRUE)
+data(english)
+```
+
+Podaci se sada mogu koristiti naredbom `english`, npr. deskriptivna statistika može se dobiti naredbom `summary(english)`, a pregled prvih par redova podataka može se pregledati naredbom `head(english)`.
+
+# Ishodi eksperimenta
+
+## Utjecaj dobi na brzinu rješavanja
+
+Pitamo se utječe li dobna razlika između starijih i mlađih ispitanika na brzinu rješavanja zadataka? Uspoređujući srednje vrijednosti logaritama vremena za rješavanje A i B zadataka mlađih i starijih ispitanika te gledajući dijagrame, možemo zaključiti da su mlađi u prosjeku brže rješavali oba zadatka.
+
+```{r}
+young = english[english$AgeSubject == "young", ]
+old = english[english$AgeSubject == "old", ]
+
+RTlexdec_young = young[, "RTlexdec"]
+RTlexdec_old = old[, "RTlexdec"]
+RTnaming_young = young[, "RTnaming"]
+RTnaming_old = old[, "RTnaming"]
+
+mean(RTlexdec_young)
+mean(RTlexdec_old)
+mean(RTnaming_young)
+mean(RTnaming_old)
+
+plot(RTlexdec_young, col = 'blue', 
+     ylim=c(min(english$RTlexdec), max(english$RTlexdec)),
+     ylab="Vrijeme za prvi zadatak"
+     )
+
+points(RTlexdec_old, col='red')
+
+plot(RTnaming_young, col = 'blue', 
+     ylim=c(min(english$RTnaming), max(english$RTnaming)),
+     ylab="Vrijeme za drugi zadatak"
+     )
+
+points(RTnaming_old, col='red')
+
+```
+
+2. Koje mjere složenosti riječi najviše utječu na brzinu rješavanja zadataka (npr. što će više
+otežati zadatak, ako riječ ima više slova ili ako ima više različitih značenja)?
+
+```{r}
+complexity = english[, c("RTlexdec", "RTnaming", "LengthInLetters", "NumberComplexSynsets")]
+```
+
