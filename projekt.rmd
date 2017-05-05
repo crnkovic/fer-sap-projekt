@@ -2,7 +2,7 @@
 title: "Analiza studije razumijevanja riječi"
 author: "Grupa **sudo**"
 date: "3 May 2017"
-output: html_document
+output: pdf_document
 ---
 
 ```{r setup, include=FALSE}
@@ -32,21 +32,23 @@ Podaci se sada mogu koristiti naredbom `english`, npr. deskriptivna statistika m
 
 ## Utjecaj dobi na brzinu rješavanja
 
-Pitamo se utječe li dobna razlika između starijih i mlađih ispitanika na brzinu rješavanja zadataka? Uspoređujući srednje vrijednosti logaritama vremena za rješavanje A i B zadataka mlađih i starijih ispitanika te gledajući dijagrame, možemo zaključiti da su mlađi u prosjeku brže rješavali oba zadatka.
+Pitamo se utječe li dobna razlika između starijih i mlađih ispitanika na brzinu rješavanja zadataka? Uspoređujući srednje vrijednosti logaritama vremena za rješavanje A i B zadataka mlađih i starijih ispitanika te gledajući dijagrame, možemo zaključiti da su mlađi u prosjeku brže rješavali oba zadatka. *t-testom* potvrđujemo naš zaključak.
 
 ```{r}
-young = english[english$AgeSubject == "young", ]
-old = english[english$AgeSubject == "old", ]
+young = english[english$AgeSubject == "young", ] # mladi
+old = english[english$AgeSubject == "old", ] # stari
 
+ # vrijeme potrebno mlađima za rješavanje prvog zadatka
 RTlexdec_young = young[, "RTlexdec"]
-RTlexdec_old = old[, "RTlexdec"]
-RTnaming_young = young[, "RTnaming"]
-RTnaming_old = old[, "RTnaming"]
 
-mean(RTlexdec_young)
-mean(RTlexdec_old)
-mean(RTnaming_young)
-mean(RTnaming_old)
+ # vrijeme potrebno starijima za rješavanje prvog zadatka
+RTlexdec_old = old[, "RTlexdec"]
+
+ # vrijeme potrebno mlađima za rješavanje drugog zadatka
+RTnaming_young = young[, "RTnaming"]
+
+ # vrijeme potrebno starijima za rješavanje drugog zadatka
+RTnaming_old = old[, "RTnaming"]
 
 plot(RTlexdec_young, col = 'blue', 
      ylim = c(min(english$RTlexdec), max(english$RTlexdec)),
@@ -60,20 +62,29 @@ plot(RTnaming_young, col = 'blue',
 
 points(RTnaming_old, col='red')
 
+# testiranje jednakosti varijance prije t-testa
+var.test(RTlexdec_young, RTlexdec_old)
+
+t.test(RTlexdec_young, RTlexdec_old, alt = "less", var.equal = TRUE)
+
 ```
 
-2. Koje mjere složenosti riječi najviše utječu na brzinu rješavanja zadataka (npr. što će više otežati zadatak, ako riječ ima više slova ili ako ima više različitih značenja)?
+## Prepoznatljivost riječi s obzirom na frekvenciju pojavljivanja
+
+Zanima nas jesu li riječi koje se više pojavljuje prepoznatljivije? Računamo korelaciju između prepoznatljivosti riječi i njenog pojavljivanja u tekstovima. Dobivamo korelaciju `~0.8`, što nam potvrđuje da su te dvije stavke povezane, tj. riječi koje se više pojavljuju su prepoznatljivije. To također vidimo i iz dijagrama rasipanja.
 
 ```{r}
 cor(english$Familiarity, english$WrittenFrequency)
 plot(english$Familiarity, english$WrittenFrequency)
-#korelacija i graf prepoznatljivosti riječi i njenog pojavljivanja u tekstovima iz čega se može iščitati da su poznatije riječi koje se više pojavljuju, ali se možda očekivalo da korelacija bude još i veća
+```
 
+## Utjecaj glasa prvog slova na prepoznatljivost riječi
 
-#plot(english$Familiarity, english$WrittenSpokenFrequencyRatio)
+Je li riječ koja počinje na samoglasnik u odnosu na suglasnik ljudima prepoznatljivija? Uzimamo skup riječi koje počinju sa samoglasnikom, te skup riječi koje počinju sa suglasnikom te računamo srednju vrijednost. Kod samoglasnika dobivamo srednju vrijednost `4.0`, a kod suglasnika `3.79`, što bi nas moglo dovesti do zaključka da riječi koje počinju sa samoglasnikom su prepoznatljivije. No testiranjem putem *t-testa* zaključujemo da ne postoji razlika između prepoznatljivosti riječi koje počinju samoglasnikom u odnosu na one koje počinju suglasnikom.
 
-firstVowel = english[english$CV == "V",]
-firstConsonant = english[english$CV == "C",]
+```{r}
+firstVowel = english[english$CV == "V",] #riječi koje počinju sa samoglasnikom
+firstConsonant = english[english$CV == "C",] # riječi koje počinju sa suglasnikom
 
 mean(firstConsonant$Familiarity)
 mean(firstVowel$Familiarity)
@@ -81,17 +92,26 @@ mean(firstVowel$Familiarity)
 hist(firstConsonant$Familiarity)
 hist(firstVowel$Familiarity)
 
-var(firstConsonant$Familiarity)
-var(firstVowel$Familiarity)
-
+# prije testiranja t-testom trebamo zaključiti jesu li varijance jednake u oba slučaja
 var.test(firstConsonant$Familiarity, firstVowel$Familiarity)
 
 t.test(firstVowel$Familiarity, firstConsonant$Familiarity, alt = "greater", var.equal = TRUE)
-#Znači testira san je li se ljudima poznatije riječi koje počinju sa samoglasnicima od onih koje počinju sa suglasnicima,histogrami su da bi se pokazala normalnost podataka šta više manje je. Šta se tiče testa nisan baš siguran kako se to interpterira al mislin da kaže da ne postoji razlika.
+```
 
+```{r}
 #cor(english$WrittenSpokenFrequencyRatio, english$RTlexdec)
-#help(cor)
 
 moreSpoken = english[english$WrittenSpokenFrequencyRatio > 0, ]
 #je li riječi koje se više govore, dakle writespokefrequncyratio < 0 imaju i veći rezultat na RTnamingu
+```
+
+```{r}
+numericYoung = young[sapply(english, is.numeric)]
+numericOld = old[sapply(english, is.numeric)]
+
+cor(numericOld)
+cor(numericYoung)
+
+diff = cor(numericOld) - cor(numericYoung)
+diff
 ```
