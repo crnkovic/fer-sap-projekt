@@ -2,7 +2,7 @@
 title: "Analiza studije razumijevanja riječi"
 author: "Grupa **sudo**"
 date: "3 May 2017"
-output: pdf_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -11,7 +11,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Opis eksperimenta
 
-Nad velikim brojem ispitanika proveden je eksperiment razumijevanja engleskog jezika. Ispitanicima su dana dva zadatka te su oba ponavljana više puta. Prvi zadatak (dalje: **A**) bavi se prepoznavanje ispravne riječi, prilikom čega je ispitanik za zadani niz znakova morao odrediti radi li se o ispravnoj riječi engleskog jezike, a drugi zadatak (dalje: **B**) se bavi pravilnim izgovaranjem zadane riječi. Za svaku riječ i svakog ispitanika mjereno je vrijeme rješavanja svakog zadatka, te niz podataka o ispitaniku.
+Nad velikim brojem ispitanika proveden je eksperiment razumijevanja engleskog jezika. Ispitanicima su dana dva zadatka te su oba ponavljana više puta. Prvi zadatak (dalje: **A**) bavi se prepoznavanjem ispravne riječi, prilikom čega je ispitanik za zadani niz znakova morao odrediti radi li se o ispravnoj riječi engleskog jezika, a drugi zadatak (dalje: **B**) se bavi pravilnim izgovaranjem zadane riječi. Za svaku riječ i svakog ispitanika mjereno je vrijeme rješavanja svakog zadatka, te niz podataka o ispitaniku.
 
 ## Ishodi eksperimenta
 
@@ -49,33 +49,26 @@ mean(RTnaming_young)
 mean(RTnaming_old)
 
 plot(RTlexdec_young, col = 'blue', 
-     ylim=c(min(english$RTlexdec), max(english$RTlexdec)),
-     ylab="Vrijeme za prvi zadatak"
-     )
+     ylim = c(min(english$RTlexdec), max(english$RTlexdec)),
+     ylab = "Vrijeme za prvi zadatak")
 
 points(RTlexdec_old, col='red')
 
 plot(RTnaming_young, col = 'blue', 
-     ylim=c(min(english$RTnaming), max(english$RTnaming)),
-     ylab="Vrijeme za drugi zadatak"
-     )
+     ylim = c(min(english$RTnaming), max(english$RTnaming)),
+     ylab = "Vrijeme za drugi zadatak")
 
 points(RTnaming_old, col='red')
 
 ```
 
-2. Koje mjere složenosti riječi najviše utječu na brzinu rješavanja zadataka (npr. što će više
-otežati zadatak, ako riječ ima više slova ili ako ima više različitih značenja)?
+2. Koje mjere složenosti riječi najviše utječu na brzinu rješavanja zadataka (npr. što će više otežati zadatak, ako riječ ima više slova ili ako ima više različitih značenja)?
 
 ```{r}
-complexity = english[, c("RTlexdec", "RTnaming", "LengthInLetters", "NumberComplexSynsets")]
-```
-
-```{r}
-
 cor(english$Familiarity, english$WrittenFrequency)
 plot(english$Familiarity, english$WrittenFrequency)
-#korelacija i graf prepoznatljivosti riječi i njenog pojavljivanja u tekstovima iz čega se može iščitat da su poznatije riječi koje se više pojavljuju, ali se možda očekivalo da korelacija bude još i veća
+#korelacija i graf prepoznatljivosti riječi i njenog pojavljivanja u tekstovima iz čega se može iščitati da su poznatije riječi koje se više pojavljuju, ali se možda očekivalo da korelacija bude još i veća
+
 
 #plot(english$Familiarity, english$WrittenSpokenFrequencyRatio)
 
@@ -97,9 +90,8 @@ t.test(firstVowel$Familiarity, firstConsonant$Familiarity, alt = "greater", var.
 #Znači testira san je li se ljudima poznatije riječi koje počinju sa samoglasnicima od onih koje počinju sa suglasnicima,histogrami su da bi se pokazala normalnost podataka šta više manje je. Šta se tiče testa nisan baš siguran kako se to interpterira al mislin da kaže da ne postoji razlika.
 
 #cor(english$WrittenSpokenFrequencyRatio, english$RTlexdec)
-help(cor)
+#help(cor)
 
-
-moreSpoken = english[english$WrittenSpokenFrequencyRatio > 0]
+moreSpoken = english[english$WrittenSpokenFrequencyRatio > 0, ]
 #je li riječi koje se više govore, dakle writespokefrequncyratio < 0 imaju i veći rezultat na RTnamingu
 ```
