@@ -125,10 +125,6 @@ Testiramo nezavisnost na ove dvije varijable i očekujemo da su one povezane jer
 chisq.test(english$WrittenFrequency, english$LengthInLetters, simulate.p.value = TRUE)
 ```
 
-```{r}
-cor(english$WrittenFrequency, english$LengthInLetters)
-```
-
 ## Logistička regresija
 Naučite model logističke regresije da predviđa varijablu WordCategory na temelju prediktorskih varijabli RTlexdec i RTnaming.
 
