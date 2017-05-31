@@ -112,10 +112,9 @@ t.test(firstVowel$Familiarity, firstConsonant$Familiarity, alt = "greater", var.
 
 ## Prepoznatljivost glagola u odnosu na imenice
 
-Ukoliko nađemo prepoznatljivosti glagola te prepoznatljivosti imenica, s obzirom da imamo veliku količinu podataka, možemo provesti *z-test* nad prepoznatljivostima te uz alternativnu hipotezu da je prepoznatljivost glagola veća od prepoznatljivosti imenica ne zaključujemo da su glagoli prepoznatljiviji, pa provodimo drugi *z-test* da su imenice prepoznatljivije od glagola. Na temelju drugog testa zaključujemo da su imenice prepoznatljivije od glagola.
+Ukoliko nađemo prepoznatljivosti glagola te prepoznatljivosti imenica, s obzirom da imamo veliku količinu podataka, možemo provesti *z-test* nad prepoznatljivostima te uz alternativnu hipotezu da je prepoznatljivost glagola veća od prepoznatljivosti imenica ne zaključujemo (uz razinu signifikantnosti 5%) da su glagoli prepoznatljiviji, pa provodimo drugi *z-test* da su imenice prepoznatljivije od glagola. Na temelju drugog testa zaključujemo da su imenice prepoznatljivije od glagola.
 
 ```{r}
-
 require(BSDA, quietly = TRUE)
 
 verb_familiarity = english[english$WordCategory == "V", ]$Familiarity
@@ -128,9 +127,15 @@ z.test(verb_familiarity, y = noun_familiarity, alternative = "greater", sigma.x 
 
 
 z.test(noun_familiarity, y = verb_familiarity, alternative = "greater", sigma.x = noun_sd, sigma.y = verb_sd)
-
 ```
 
+## Zavisnost broja pojavljivanja riječi u velikoj zbirci tekstova i duljine riječi
+
+Testiramo nezavisnost na ove dvije varijable i očekujemo da su one povezane jer riječi "i", "ili", "ako", itd. se češće pojavljuju od neke dugačke riječi. Provodimo hi-kvadrat test nezavisnosti s razinom signifikantnosti 5% te dobivamo p-vrijednost manju od 5% i zaključujemo da su te dvije varijable povezane.
+
+```{r}
+chisq.test(english$WrittenFrequency, english$LengthInLetters, simulate.p.value = TRUE)
+```
 
 ```{r}
 cor(english$WrittenFrequency, english$LengthInLetters)
