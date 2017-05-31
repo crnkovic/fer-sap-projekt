@@ -131,3 +131,41 @@ moreSpoken = english[english$WrittenSpokenFrequencyRatio > 0, ]
 #diff = cor(numericOld) - cor(numericYoung)
 #diff
 ```
+
+#Logistička regresija
+Naučite model logističke regresije da predviđa varijablu WordCategory na temelju prediktorskih varijabli RTlexdec i RTnaming.
+
+```{r}
+model1 = glm(WordCategory ~ RTlexdec + RTnaming, data = english, family = binomial())
+summary(model1)
+```
+
+Pomoću anove ćemo testirati postoji li razlika između prije naučenih modela na razini značajnosti 95% tako što ćemo testirati nultu hipotezu da nema razlike.
+U prvom slučaju nam p-vrijednost ispadne veća od 0.05, pa ne možemo odbaciti nultu hipotezu. 
+U drugom slučaju nam p-vrijednost ispadne manja od 0.05, pa nultu hipotezu odbacujemo.
+
+```{r}
+model2 = glm(WordCategory ~ RTlexdec, data = english, family = binomial())
+summary(model2)
+anova(model1, model2, test= "LRT")
+
+model3 = glm(WordCategory ~ RTnaming, data = english, family = binomial())
+summary(model3)
+anova(model1, model3, test = "LRT")
+```
+
+Predviđanja i šanse (malo radi fore):
+```{r}
+test1 = english[5,]
+p1 = predict(model1, test1, type = "response")
+p2 = predict(model2, test1, type = "response")
+p3 = predict(model3, test1, type = "response")
+
+test2 = english[18,]
+p4 = predict(model1, test2, type = "response")
+p5 = predict(model2, test2, type = "response")
+p6 = predict(model3, test2, type = "response")
+
+odds1 = p1/(1-p1)
+odds2 = p4/(1-p4)
+```
