@@ -99,13 +99,37 @@ t.test(firstVowel$Familiarity, firstConsonant$Familiarity, alt = "greater", var.
 ```
 
 ## Utjecaj broja samoglasnika na brzinu rješavanja zadataka
+
+## int procjena za broj slova
+
+
 ## Veza između frekvencije pojavljivanja i duljine riječi
 ## jel rijeci koje se pisu slicno imaju isti broj slova
 ## ako se rijec pise slicno ko neka druga, jesu li obe najcesce u sluzbi glagola/imenice
 ## ovisnost vremena i broja slova
 ## ovisnost vremena i broja pojavljivanja rijeci
 ## pojavljuju li se vise kratke ili duge rijeci
-## prepoznaju li se vise glagoli ili imenice
+
+## Prepoznatljivost glagola u odnosu na imenice
+
+Ukoliko nađemo prepoznatljivosti glagola te prepoznatljivosti imenica, s obzirom da imamo veliku količinu podataka, možemo provesti *z-test* nad prepoznatljivostima te uz alternativnu hipotezu da je prepoznatljivost glagola veća od prepoznatljivosti imenica ne zaključujemo da su glagoli prepoznatljiviji, pa provodimo drugi *z-test* da su imenice prepoznatljivije od glagola. Na temelju drugog testa zaključujemo da su imenice prepoznatljivije od glagola.
+
+```{r}
+
+require(BSDA, quietly = TRUE)
+
+verb_familiarity = english[english$WordCategory == "V", ]$Familiarity
+noun_familiarity = english[english$WordCategory == "N", ]$Familiarity
+
+verb_sd = sd(english[english$WordCategory == "V", ]$Familiarity)
+noun_sd = sd(english[english$WordCategory == "N", ]$Familiarity)
+
+z.test(verb_familiarity, y = noun_familiarity, alternative = "greater", sigma.x = verb_sd, sigma.y = noun_sd)
+
+
+z.test(noun_familiarity, y = verb_familiarity, alternative = "greater", sigma.x = noun_sd, sigma.y = verb_sd)
+
+```
 
 
 ```{r}
