@@ -126,7 +126,7 @@ chisq.test(english$WrittenFrequency, english$LengthInLetters, simulate.p.value =
 ```
 
 ## Logistička regresija
-Naučite model logističke regresije da predviđa varijablu WordCategory na temelju prediktorskih varijabli RTlexdec i RTnaming.
+Učimo modele logističke regresije da predviđaju varijablu WordCategory na temelju prediktorskih varijabli RTlexdec i RTnaming (obje te pojedinačno).
 
 ```{r}
 model1 = glm(WordCategory ~ RTlexdec + RTnaming, data = english, family = binomial())
@@ -147,7 +147,7 @@ summary(model3)
 anova(model1, model3, test = "LRT")
 ```
 
-Predviđanja i šanse:
+Primjer predviđanja i šanse za dva podatka iz skupa:
 ```{r}
 test1 = english[5,]
 p1 = predict(model1, test1, type = "response")
