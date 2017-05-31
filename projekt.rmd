@@ -98,6 +98,22 @@ var.test(firstConsonant$Familiarity, firstVowel$Familiarity)
 t.test(firstVowel$Familiarity, firstConsonant$Familiarity, alt = "greater", var.equal = TRUE)
 ```
 
+## Utjecaj broja samoglasnika na brzinu rješavanja zadataka
+## Veza između frekvencije pojavljivanja i duljine riječi
+## jel rijeci koje se pisu slicno imaju isti broj slova
+## ako se rijec pise slicno ko neka druga, jesu li obe najcesce u sluzbi glagola/imenice
+## ovisnost vremena i broja slova
+## ovisnost vremena i broja pojavljivanja rijeci
+## pojavljuju li se vise kratke ili duge rijeci
+## prepoznaju li se vise glagoli ili imenice
+
+
+```{r}
+cor(english$WrittenFrequency, english$LengthInLetters)
+```
+
+
+
 ```{r}
 #cor(english$WrittenSpokenFrequencyRatio, english$RTlexdec)
 
@@ -106,12 +122,12 @@ moreSpoken = english[english$WrittenSpokenFrequencyRatio > 0, ]
 ```
 
 ```{r}
-numericYoung = young[sapply(english, is.numeric)]
-numericOld = old[sapply(english, is.numeric)]
+#numericYoung = young[sapply(english, is.numeric)]
+#numericOld = old[sapply(english, is.numeric)]
 
-cor(numericOld)
-cor(numericYoung)
+#cor(numericOld)
+#cor(numericYoung)
 
-diff = cor(numericOld) - cor(numericYoung)
-diff
+#diff = cor(numericOld) - cor(numericYoung)
+#diff
 ```
