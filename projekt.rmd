@@ -30,6 +30,16 @@ Podaci se sada mogu koristiti naredbom `english`, npr. deskriptivna statistika m
 
 # Ishodi eksperimenta
 
+## Deskriptivna statistika najbitnijih značajki
+
+U studiji je sudjelovao jednak broj mladih i starih, tj. 2284 svakih. Imenica je bilo 2604, a glagola 1664. 
+```{r}
+#summary(english)
+summary(english$AgeSubject)
+plot(english$WordCategory)
+```
+
+
 ## Utjecaj dobi na brzinu rješavanja
 
 Pitamo se utječe li dobna razlika između starijih i mlađih ispitanika na brzinu rješavanja zadataka? Uspoređujući srednje vrijednosti logaritama vremena za rješavanje A i B zadataka mlađih i starijih ispitanika te gledajući dijagrame, možemo zaključiti da su mlađi u prosjeku brže rješavali oba zadatka. *t-testom* potvrđujemo naš zaključak.
@@ -65,7 +75,7 @@ points(RTnaming_old, col='red')
 # testiranje jednakosti varijance prije t-testa
 var.test(RTlexdec_young, RTlexdec_old)
 
-t.test(RTlexdec_young, RTlexdec_old, alt = "less", var.equal = TRUE)
+t.test(RTlexdec_young, RTlexdec_old, alt = "two.sided", var.equal = TRUE)
 
 ```
 
@@ -95,7 +105,7 @@ hist(firstVowel$Familiarity)
 # prije testiranja t-testom trebamo zaključiti jesu li varijance jednake u oba slučaja
 var.test(firstConsonant$Familiarity, firstVowel$Familiarity)
 
-t.test(firstVowel$Familiarity, firstConsonant$Familiarity, alt = "greater", var.equal = TRUE)
+t.test(firstVowel$Familiarity, firstConsonant$Familiarity, alt = "two.sided", var.equal = TRUE)
 ```
 
 ## Prepoznatljivost glagola u odnosu na imenice
@@ -133,7 +143,7 @@ model1 = glm(WordCategory ~ RTlexdec + RTnaming, data = english, family = binomi
 summary(model1)
 ```
 
-Pomoću anove ćemo testirati postoji li razlika između prije naučenih modela na razini značajnosti 95% tako što ćemo testirati nultu hipotezu da nema razlike.
+Koristimo test omjera izglednosti da testiramo postoji li značajna razlika u kvaliteti ovih modela. Testirat ćemo postoji li razlika između modela na razini značajnosti 95% tako što ćemo testirati nultu hipotezu da nema razlike.
 U prvom slučaju nam p-vrijednost ispadne veća od 0.05, pa ne možemo odbaciti nultu hipotezu. 
 U drugom slučaju nam p-vrijednost ispadne manja od 0.05, pa nultu hipotezu odbacujemo.
 
