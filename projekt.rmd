@@ -37,6 +37,7 @@ U studiji je sudjelovao jednak broj mladih i starih, tj. 2284 svakih. Imenica je
 #summary(english)
 summary(english$AgeSubject)
 plot(english$WordCategory)
+#head(english)
 ```
 
 
@@ -75,7 +76,7 @@ points(RTnaming_old, col='red')
 # testiranje jednakosti varijance prije t-testa
 var.test(RTlexdec_young, RTlexdec_old)
 
-t.test(RTlexdec_young, RTlexdec_old, alt = "two.sided", var.equal = TRUE)
+t.test(RTlexdec_young, RTlexdec_old, alt = "two.sided", var.equal = FALSE)
 
 ```
 
@@ -146,6 +147,7 @@ summary(model1)
 Koristimo test omjera izglednosti da testiramo postoji li značajna razlika u kvaliteti ovih modela. Testirat ćemo postoji li razlika između modela na razini značajnosti 95% tako što ćemo testirati nultu hipotezu da nema razlike.
 U prvom slučaju nam p-vrijednost ispadne veća od 0.05, pa ne možemo odbaciti nultu hipotezu. 
 U drugom slučaju nam p-vrijednost ispadne manja od 0.05, pa nultu hipotezu odbacujemo.
+AIC je mjera prilagodbe modela i kod nje manja vrijednost znači bolji model. S obzirom na to da je kod naših modela AIC mjera jako velika, možemo zaključiti da modeli nisu jako dobri.
 
 ```{r}
 model2 = glm(WordCategory ~ RTlexdec, data = english, family = binomial())
@@ -157,14 +159,15 @@ summary(model3)
 anova(model1, model3, test = "LRT")
 ```
 
-Primjer predviđanja i šanse za dva podatka iz skupa:
+Primjer predviđanja i šanse za dva podatka iz skupa.
+U prvom slučaju je predviđanje točno, a u drugom nije.
 ```{r}
 test1 = english[5,]
 p1 = predict(model1, test1, type = "response")
 p2 = predict(model2, test1, type = "response")
 p3 = predict(model3, test1, type = "response")
 
-test2 = english[18,]
+test2 = english[3055,]
 p4 = predict(model1, test2, type = "response")
 p5 = predict(model2, test2, type = "response")
 p6 = predict(model3, test2, type = "response")
