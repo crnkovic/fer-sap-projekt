@@ -1,0 +1,196 @@
+---
+title: "Analiza studije razumijevanja riječi"
+author: "Josip Crnković, Ivica Šimić, Ivica Jezernik"
+date: "3 May 2017"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Opis eksperimenta
+
+Nad velikim brojem ispitanika proveden je eksperiment razumijevanja engleskog jezika. Ispitanicima su dana dva zadatka te su oba ponavljana više puta. Prvi zadatak bavi se prepoznavanjem ispravne riječi, prilikom čega je ispitanik za zadani niz znakova morao odrediti radi li se o ispravnoj riječi engleskog jezika, a drugi zadatak se bavi pravilnim izgovaranjem zadane riječi. Za svaku riječ i svakog ispitanika mjereno je vrijeme rješavanja svakog zadatka, te niz podataka o ispitaniku.
+
+## Ishodi eksperimenta
+
+Cilj eksperimenta je naučiti kako mjerene veličine ispitanika utječu na vrijeme potrebno za rješavanje pojedinih zadataka. Na temelju tih podataka može se odgovoriti na neka zanimljiva pitanja poput: utječe li dob na brzinu rješavanja zadataka, kako na brzinu rješavanja utječe duljina zadane riječi, je li riječ kraća ukoliko se češće pojavljuje, itd.
+
+# Skup podataka
+
+Za određivanje ishoda eksperimenta potreban nam je skup podataka eksperimenta. Programski jezik R sadrži skup podataka već provedenog eksperimenta te nam dopušta uključivanje tog skupa te analizu podataka. Podaci se nalaze u paketu `languageR`. Nakon instaliranja paketa, podaci se mogu učitati naredbom `require(languageR)` te dohvatiti s naredbom `data(english)`. Kompletno dohvaćanje i uključivanje podataka prikazano je kodom ispod.
+
+```{r}
+require(languageR, quietly = TRUE)
+data(english)
+```
+
+Podaci se sada mogu koristiti naredbom `english`, npr. deskriptivna statistika može se dobiti naredbom `summary(english)`, a pregled prvih par redova podataka može se pregledati naredbom `head(english)`.
+
+# Ishodi eksperimenta
+
+## Prikaz najbitnijih značajki
+
+U studiji je sudjelovao jednak broj mladih i starih, tj. 2284 od svake grupe. Ispitane riječi su bile imenice u 2604 slučaja, a glagoli u 1664. Prosječno vrijeme rješavanja prvog zadatka je 6.55 sekundi, a drugog 6.32 sekunde.
+
+```{r}
+mean(english$RTlexdec)
+mean(english$RTnaming)
+
+boxplot(english$RTlexdec)
+boxplot(english$RTnaming)
+
+hist(english$LengthInLetters)
+
+#summary(english)
+summary(english$AgeSubject)
+plot(english$WordCategory)
+#head(english)
+```
+
+
+## Utjecaj dobi na brzinu rjesavanja
+
+Pitamo se utječe li dobna razlika između starijih i mladih ispitanika na brzinu rješavanja zadataka? Uspoređujuci srednje vrijednosti logaritama vremena za rješavanje A i B zadataka mladih i starijih ispitanika te gledajući dijagrame, možemo zaključiti da su mladi u prosjeku brže rješavali oba zadatka. Provođenjem  *t-testa* potvrđujemo nas zaključak.
+
+```{r}
+young = english[english$AgeSubject == "young", ] # mladi
+old = english[english$AgeSubject == "old", ] # stari
+
+ # vrijeme potrebno mladima za rjesavanje prvog zadatka
+RTlexdec_young = young[, "RTlexdec"]
+
+ # vrijeme potrebno starijima za rjesavanje prvog zadatka
+RTlexdec_old = old[, "RTlexdec"]
+
+ # vrijeme potrebno mladima za rjesavanje drugog zadatka
+RTnaming_young = young[, "RTnaming"]
+
+ # vrijeme potrebno starijima za rjesavanje drugog zadatka
+RTnaming_old = old[, "RTnaming"]
+
+plot(RTlexdec_young, col = 'blue', 
+     ylim = c(min(english$RTlexdec), max(english$RTlexdec)),
+     ylab = "Vrijeme za prvi zadatak")
+
+points(RTlexdec_old, col='red')
+
+plot(RTnaming_young, col = 'blue', 
+     ylim = c(min(english$RTnaming), max(english$RTnaming)),
+     ylab = "Vrijeme za drugi zadatak")
+
+points(RTnaming_old, col='red')
+
+# testiranje jednakosti varijance prije t-testa
+var.test(RTlexdec_young, RTlexdec_old)
+
+t.test(RTlexdec_young, RTlexdec_old, alt = "two.sided", var.equal = FALSE)
+
+```
+
+S obzirom da smo dobili malu p-vrijednost, odbacujemo hipotezu da su vremena rješavanja prvog zadatka jednaka za obje dobne skupine.
+
+## Prepoznatljivost riječi s obzirom na frekvenciju pojavljivanja u tekstu
+
+Zanima nas jesu li riječi koje se više pojavljuje u velikom tekstu prepoznatljivije? Računamo korelaciju između prepoznatljivosti riječi i njenog pojavljivanja u tekstovima. Dobivamo korelaciju `~0.8`, što nam potvrđuje da su te dvije stavke povezane, tj. riječi koje se više pojavljuju su prepoznatljivije. To također vidimo i iz dijagrama rasipanja.
+
+```{r}
+cor(english$Familiarity, english$WrittenFrequency)
+plot(english$Familiarity, english$WrittenFrequency)
+```
+
+## Utjecaj glasa prvog slova na prepoznatljivost riječi
+
+Je li riječ koja počinje na samoglasnik u odnosu na suglasnik ljudima prepoznatljivija? Uzimamo skup riječi koje počinju samoglasnikom, te skup riječi koje počinju suglasnikom te računamo srednju vrijednost. Kod samoglasnika dobivamo srednju vrijednost `4.0`, a kod suglasnika `3.79`, što bi nas moglo dovesti do zaključka da su riječi koje počinju samoglasnikom prepoznatljivije. No testiranjem putem *t-testa* s razinom signifikantnosti 5% zaključujemo da ne postoji razlika između prepoznatljivosti riječi koje počinju samoglasnikom u odnosu na one koje počinju suglasnikom.
+
+```{r}
+firstVowel = english[english$CV == "V",] #rijeci koje pocinju sa samoglasnikom
+firstConsonant = english[english$CV == "C",] # rijeci koje pocinju sa suglasnikom
+
+mean(firstConsonant$Familiarity)
+mean(firstVowel$Familiarity)
+
+hist(firstConsonant$Familiarity)
+hist(firstVowel$Familiarity)
+
+# prije testiranja t-testom trebamo zakljuciti jesu li varijance jednake u oba slucaja
+var.test(firstConsonant$Familiarity, firstVowel$Familiarity)
+```
+
+Zaključujemo da varijance nisu jednake (omjer ~0.78) te u *t-testu* stavljamo `var.equal = FALSE`.
+
+```{r}
+t.test(firstVowel$Familiarity, firstConsonant$Familiarity, alt = "two.sided", var.equal = FALSE)
+```
+
+Na temelju male p-vrijednosti odbacujemo hipotezu i zaključujemo da ne postoji razlika u prepoznatljivosti riječi koje počinju samoglasnikom u odnosu na one koji počinju suglasnikom.
+
+## Prepoznatljivost glagola u odnosu na imenice
+
+Ukoliko nađemo prepoznatljivosti glagola te prepoznatljivosti imenica, s obzirom da imamo veliku količinu podataka, možemo provesti *z-test* nad prepoznatljivostima te uz alternativnu hipotezu da je prepoznatljivost jedne vrste riječi veća od prepoznatljivosti druge zaključujemo (uz razinu signifikantnosti 5%) da postoji razlika u prepoznatljivosti. Na temelju provjera srednjih vrijednosti zaključujemo da su imenice prepoznatljivije od glagola.
+
+```{r}
+require(BSDA, quietly = TRUE)
+
+verb_familiarity = english[english$WordCategory == "V", ]$Familiarity
+noun_familiarity = english[english$WordCategory == "N", ]$Familiarity
+
+verb_sd = sd(english[english$WordCategory == "V", ]$Familiarity)
+noun_sd = sd(english[english$WordCategory == "N", ]$Familiarity)
+
+z.test(verb_familiarity, y = noun_familiarity, alternative = "two.sided", sigma.x = verb_sd, sigma.y = noun_sd)
+
+mean(verb_familiarity)
+mean(noun_familiarity)
+```
+
+## Zavisnost broja pojavljivanja riječi u velikoj zbirci tekstova i duljine riječi
+
+Testiramo nezavisnost na ove dvije varijable i očekujemo da su one povezane jer riječi "i", "ili", "ako", itd. se češće pojavljuju od neke dugačke riječi. Provodimo hi-kvadrat test nezavisnosti s razinom signifikantnosti 5% te dobivamo p-vrijednost manju od 5% i zaključujemo da su te dvije varijable povezane.
+
+```{r}
+chisq.test(english$WrittenFrequency, english$LengthInLetters, simulate.p.value = TRUE)
+```
+
+## Logistička regresija
+
+Učimo modele logističke regresije da predviđaju varijablu *WordCategory* na temelju prediktorskih varijabli *RTlexdec* i *RTnaming* (obje te pojedinačno).
+
+```{r}
+model1 = glm(WordCategory ~ RTlexdec + RTnaming, data = english, family = binomial())
+summary(model1)
+```
+
+Koristimo test omjera izglednosti da testiramo postoji li značajna razlika u kvaliteti ovih modela. Testirat ćemo postoji li razlika između modela na razini značajnosti 95% tako što ćemo testirati nultu hipotezu da nema razlike.
+U prvom slučaju nam p-vrijednost ispadne veća od `0.05`, pa ne možemo odbaciti nultu hipotezu. 
+U drugom slučaju nam p-vrijednost ispadne manja od `0.05`, pa nultu hipotezu odbacujemo.
+AIC je mjera prilagodbe modela i kod nje manja vrijednost znači bolji model. S obzirom na to da je kod naših modela AIC mjera jako velika, možemo zaključiti da modeli nisu jako dobri.
+
+```{r}
+model2 = glm(WordCategory ~ RTlexdec, data = english, family = binomial())
+summary(model2)
+anova(model1, model2, test= "LRT")
+
+model3 = glm(WordCategory ~ RTnaming, data = english, family = binomial())
+summary(model3)
+anova(model1, model3, test = "LRT")
+```
+
+Primjer predviđanja i šanse za dva podatka iz skupa.
+U prvom slučaju je predviđanje točno, a u drugom nije.
+
+```{r}
+test1 = english[5,]
+p1 = predict(model1, test1, type = "response")
+p2 = predict(model2, test1, type = "response")
+p3 = predict(model3, test1, type = "response")
+
+test2 = english[3055,]
+p4 = predict(model1, test2, type = "response")
+p5 = predict(model2, test2, type = "response")
+p6 = predict(model3, test2, type = "response")
+
+odds1 = p1/(1-p1)
+odds2 = p4/(1-p4)
+```
